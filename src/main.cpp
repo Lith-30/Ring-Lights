@@ -9,11 +9,21 @@
 #define LED_TYPE    WS2812B                     // LED Type
 #define COLOR_ORDER GRB                         // Color channel order
 
+/** Define default colours */
+#define BLUE CRGB::Blue;
+#define RED CRGB::Red;
+#define YELLOW CRGB::Yellow;
+#define ORANGE CRGB(230, 35, 0);
+#define WHITE CRGB::White;
+
+/** Colours of the Buddhist Flag */
+CRGB FLAG_COLOURS[] = {BLUE, YELLOW, RED, WHITE, ORANGE};
+
+
 CRGB leds[NUM_LEDS];
 
 void rainbow();
 void red();
-void flag_colours();
 void rotate();
 void shiftRingColours(int shift_num, int ring_num);
 
@@ -53,39 +63,6 @@ void rainbow() {
   FastLED.show();
 }
 
-void flag_colours() {
-  // blue yellow red white orange
-  // first ring
-  for (int i = 0; i < LEDS_PER_RING; i++) {
-    leds[180 + i] = CRGB::Blue;
-  }
-  for (int i = 0; i < LEDS_PER_RING; i++) {
-    leds[135 + i] = CRGB(255, 190, 0);
-  }
-  for (int i = 0; i < LEDS_PER_RING; i++) {
-    leds[90 + i] = CRGB::Red;
-  }
-  for (int i = 0; i < LEDS_PER_RING; i++) {
-    leds[45 + i] = CRGB::White;
-  }
-  for (int i = 0; i < LEDS_PER_RING; i++) {
-    leds[0 + i] = CRGB(230, 35, 0);
-  }
-  FastLED.show();
-  delay(1000);
-  for (int i = 0; i < NUM_RINGS; i++) {
-    for (int j = 0; j < LEDS_PER_RING; j++) {
-      leds[i * LEDS_PER_RING + j] = CRGB::Black;
-      // Serial.println(i * LEDS_PER_RING + j);
-    }
-  }
-  FastLED.show();
-  delay(1000);
-  
-  // Serial.println("set black");
-  
-   
-}
 
 void red() {
   static uint8_t hue = 0;
@@ -127,13 +104,11 @@ void red() {
 
 void rotate() {
   int len = 9;
-
-  CRGB colours[] = {CRGB::Blue, CRGB::Yellow, CRGB::Red, CRGB::White, CRGB(230, 35, 0)};
   // CRGB colours[] = {CRGB::Red, CRGB::White, CRGB::Blue, CRGB::Yellow, CRGB(230, 35, 0)};
   for (int j = 0; j < LEDS_PER_RING; j++) {
     for (int i = 0; i < NUM_RINGS; i++) {
       for (int k = 0; k < 5; k++) {
-        leds[i * LEDS_PER_RING + (j + k * len) % LEDS_PER_RING] = colours[k];
+        leds[i * LEDS_PER_RING + (j + k * len) % LEDS_PER_RING] = FLAG_COLOURS[k];
         // Serial.println(k);
       }
       // int pos = (j - len) % LEDS_PER_RING;
@@ -148,19 +123,20 @@ void rotate() {
     }
     
   }
-  // int len = 1;
-  // for (int i = 0; i < LEDS_PER_RING; i++) {
-  //   for (int j = 0; j < len; j++) {
-  //     leds[(i - j) % LEDS_PER_RING] = CRGB::Blue;
-  //   }
-  //   if (i - len >= 0) {
-  //     leds[i - len] = CRGB::Black;
-  //   }
-  //   FastLED.show();
-  //   delay(100);
-  // }
+}
 
-  // leds[LEDS_PER_RING - 1] = CRGB::Black;
+void buddhist_flag_rotate() {
+  int len = 0;
+  for (int i = 0; i < NUM_RINGS; i++) {
+    for (int j = 0; j < LEDS_PER_RING; j++) {
+      for (int k = 0; k < 5; k++) {
+        leds[i * LEDS_PER_RING + (j + k * len) % LEDS_PER_RING] = FLAG_COLOURS[k];
+        // Serial.println(k);
+      }
+    }
+    FastLED.show();
+    delay(100);
+  }
 }
 
 /**
