@@ -14,11 +14,14 @@ CRGB leds[NUM_LEDS];
 void rainbow();
 void red();
 void flag_colours();
+void rotate();
+void shiftRingColours(int shift_num, int ring_num);
 
 void setup() {
     FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);
     FastLED.setBrightness(50);
-    Serial.begin(9600);
+    // Serial.begin(9600);
+    // set LEDs to rainbow    
 }
 
 void loop() {
@@ -30,7 +33,10 @@ void loop() {
   // }
   // FastLED.show();
   // rainbow();
-  flag_colours();
+  // shiftRingColours(1, 0);
+  rotate();
+  
+  // delay(100);
 }
 
 void rainbow() {
@@ -38,8 +44,9 @@ void rainbow() {
   for (int i = 0; i < NUM_RINGS; i++) {
     for (int j = 0; j < LEDS_PER_RING; j++) {
       leds[i * LEDS_PER_RING + j] = CHSV(hue, 255, 255);
+      hue += 2;
     }
-    hue++;
+    
     delay(10);
   }
 
@@ -64,8 +71,8 @@ void flag_colours() {
   for (int i = 0; i < LEDS_PER_RING; i++) {
     leds[0 + i] = CRGB(230, 35, 0);
   }
-  delay(1000);
   FastLED.show();
+  delay(1000);
   for (int i = 0; i < NUM_RINGS; i++) {
     for (int j = 0; j < LEDS_PER_RING; j++) {
       leds[i * LEDS_PER_RING + j] = CRGB::Black;
@@ -117,3 +124,60 @@ void red() {
 
 // Flashing lights
 // Rainbow fade
+
+void rotate() {
+  int len = 9;
+
+  CRGB colours[] = {CRGB::Blue, CRGB::Yellow, CRGB::Red, CRGB::White, CRGB(230, 35, 0)};
+  // CRGB colours[] = {CRGB::Red, CRGB::White, CRGB::Blue, CRGB::Yellow, CRGB(230, 35, 0)};
+  for (int j = 0; j < LEDS_PER_RING; j++) {
+    for (int i = 0; i < NUM_RINGS; i++) {
+      for (int k = 0; k < 5; k++) {
+        leds[i * LEDS_PER_RING + (j + k * len) % LEDS_PER_RING] = colours[k];
+        // Serial.println(k);
+      }
+      // int pos = (j - len) % LEDS_PER_RING;
+      // // This solves the tail leds staying permanently on,
+      // // as they are not accessed when j < len.
+      // if (j < len) {
+        //   pos += LEDS_PER_RING;
+        // }
+        // leds[i * LEDS_PER_RING + pos] = CRGB::Black;
+      FastLED.show();
+      // delay(1);
+    }
+    
+  }
+  // int len = 1;
+  // for (int i = 0; i < LEDS_PER_RING; i++) {
+  //   for (int j = 0; j < len; j++) {
+  //     leds[(i - j) % LEDS_PER_RING] = CRGB::Blue;
+  //   }
+  //   if (i - len >= 0) {
+  //     leds[i - len] = CRGB::Black;
+  //   }
+  //   FastLED.show();
+  //   delay(100);
+  // }
+
+  // leds[LEDS_PER_RING - 1] = CRGB::Black;
+}
+
+/**
+ * @brief Shifts the colours within a specific ring
+ */
+void shiftRingColours(int shift_num, int ring_num) {
+  // shift colours inside each circle
+  shift_num = shift_num % LEDS_PER_RING;
+  int temp_len = LEDS_PER_RING - shift_num;
+  CRGB temp[LEDS_PER_RING];
+  int ring_pos = ring_num * LEDS_PER_RING;
+  size_t ring_shift = sizeof(CRGB) * (ring_pos % NUM_RINGS);
+  size_t led_shift = sizeof(CRGB) * shift_num;
+  size_t temp_shift = sizeof(CRGB) * temp_len;
+
+  memcpy(temp, (void *) leds + ring_shift + temp_shift, temp_shift);
+  memmove(leds + ring_shift, (void *) leds + ring_shift + temp_shift, led_shift);
+  memcpy(leds + ring_shift, temp, temp_shift);
+  FastLED.show();
+}
