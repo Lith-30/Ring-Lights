@@ -30,31 +30,25 @@ void shiftRingColours(int shift_num, int ring_num);
 void setup() {
     FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);
     FastLED.setBrightness(50);
-    // Serial.begin(9600);
-    // set LEDs to rainbow    
+    // Serial.begin(9600); 
 }
 
+/**
+ * @brief Main loop
+ */
 void loop() {
-  // for (int j = 0; j < LEDS_PER_RING j++) {
-  //   if (j > 1) {
-  //     leds[j - 1] = CRGB::Black;
-  //   }
-  //   leds[j] = CRGB::Orange;
-  // }
-  // FastLED.show();
-  // rainbow();
-  // shiftRingColours(1, 0);
   rotate();
-  
-  // delay(100);
 }
 
+/**
+ * @brief Make rings show a rainbow pattern
+ */
 void rainbow() {
   static uint8_t hue = 0;
   for (int i = 0; i < NUM_RINGS; i++) {
     for (int j = 0; j < LEDS_PER_RING; j++) {
       leds[i * LEDS_PER_RING + j] = CHSV(hue, 255, 255);
-      hue += 2;
+      hue += 1;
     }
     
     delay(10);
@@ -64,44 +58,9 @@ void rainbow() {
 }
 
 
-void red() {
-  static uint8_t hue = 0;
-  for (int i = 0; i < NUM_RINGS; i++) {
-    for (int j = 0; j < LEDS_PER_RING; j++) {
-      if ((i * LEDS_PER_RING + j) % 2) {
-        leds[i * LEDS_PER_RING + j] = CRGB(255, 0, 0);
-      } else {
-        leds[i * LEDS_PER_RING + j] = CRGB(100, 100, 100);
-      }
-      
-    }
-    hue++;
-    
-  }
-
-  FastLED.show();
-  delay(1000);
-  for (int i = 0; i < NUM_RINGS; i++) {
-    for (int j = 0; j < LEDS_PER_RING; j++) {
-      if ((i * LEDS_PER_RING + j) % 2 == 0) {
-        leds[i * LEDS_PER_RING + j] = CRGB(255, 0, 0);
-      } else {
-        leds[i * LEDS_PER_RING + j] = CRGB(100, 100, 100);
-      }
-      
-    }
-    hue++;
-    
-  }
-  FastLED.show();
-  delay(1000);
-}
-
-
-
-// Flashing lights
-// Rainbow fade
-
+/**
+* @brief Sets the rings to show the colour of the buddhist flag rotating around rings 
+*/
 void rotate() {
   int len = 9;
   // CRGB colours[] = {CRGB::Red, CRGB::White, CRGB::Blue, CRGB::Yellow, CRGB(230, 35, 0)};
@@ -125,6 +84,9 @@ void rotate() {
   }
 }
 
+/**
+ * Same as rotate function, but more optimised
+ */
 void buddhist_flag_rotate() {
   int len = 0;
   for (int i = 0; i < NUM_RINGS; i++) {
@@ -140,7 +102,7 @@ void buddhist_flag_rotate() {
 }
 
 /**
- * @brief Shifts the colours within a specific ring
+ * @brief Shifts the colours within a specific ring. WIP
  */
 void shiftRingColours(int shift_num, int ring_num) {
   // shift colours inside each circle
